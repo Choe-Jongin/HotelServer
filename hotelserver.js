@@ -61,3 +61,7 @@ app.post('/room/add', function (req, res) {
 app.listen(port, function(){
     console.log('server start :'+port);
 });
+
+process.on('uncaughtException', function(error) {
+    console.log('알수 없는 에러 발생!!!!');
+});
