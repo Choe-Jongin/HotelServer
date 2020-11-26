@@ -43,20 +43,20 @@ app.get('/room/status', function (req, res) {
     });
 });
 
-/*
+
 app.post('/room/add', function (req, res) {
     var body = req.body;
     console.log(body);
 
-    var sql = 'INSERT INTO BOARD VALUES(?, ?, ?, NOW())';
-    var params = [body.id, body.title, body.content];
+    var sql = 'INSERT INTO room (num, type) VALUES(?, ?)';
+    var params = [body.num, body.type];
     console.log(sql);
     conn.query(sql, params, function(err) {
         if(err) console.log('query is not excuted. insert fail...\n' + err);
         else res.redirect('/list');
     });
 });
-*/
+
 
 app.listen(port, function(){
     console.log('server start :'+port);
