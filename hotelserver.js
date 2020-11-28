@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 const send = require('send');
 
 //서버 정보
-var host = '192.168.0.4';//jonginfi.iptime.org
+//var host = '192.168.0.4';//jonginfi.iptime.org
 var port = 5000;
 
 //DB정보
