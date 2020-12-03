@@ -34,6 +34,7 @@ app.get('/', (req, res) => {
 app.post('/login', async (req, res) => {
   const id = req.body.id;
   const password = req.body.password;
+
   if (id.length === 0 || password.length === 0) {
     res.sendStatus(403);
     return;
@@ -55,7 +56,11 @@ app.post('/login', async (req, res) => {
   });
 });
 
+//객실 관련
 room.connect(app, conn);
+
+//예약관련
+
 
 //예약 추가
 app.post('/reservation/add', async (req, res) => {
@@ -76,7 +81,7 @@ app.post('/reservation/add', async (req, res) => {
       return;
     }
 
-    etc.isRoomAvailable(conn, check_in_date, check_out_date, room_number)
+    room.isRoomAvailable(conn, check_in_date, check_out_date, room_number)
     .then(() => {
       console.log("succ");
 
@@ -112,7 +117,6 @@ app.post('/reservation/add', async (req, res) => {
 
 });
 
-
 //객실타입의 예약 정보
 app.post('/reservation/listbytype', function (req, res) {
   var body = req.body;
@@ -127,25 +131,6 @@ app.post('/reservation/listbytype', function (req, res) {
     }
   });
 });
-
-//객실타입의 예약 정보
-app.get('/reservation/listbytype', function (req, res) {
-  console.log(req.query);
-
-  var sql = "SELECT rv.room_num, rv.check_in_date, rv.check_out_date FROM reservation rv LEFT JOIN room rm ON rv.room_num = rm.num where rm.type = ?";
-  var params = [req.query.type];
-  conn.query(sql, params, function (err, rows) {
-    if (err) console.log('query is not excuted.\n' + err);
-    else {
-      res.send(rows);
-    }
-  });
-});
-
-
-
-
-
 
 //서버 시작
 app.listen(port, function () {
