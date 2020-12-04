@@ -44,32 +44,6 @@ module.exports = {
       });
     });
 
-    // //예약 가능한 룸
-    // app.get('/room/availableRoom', function (req, res) {
-    //   var sql = 'SELECT * FROM room where type = ?';
-    //   var params = [req.query.type];
-    //   if( req.query.type == null){
-    //     sql = 'SELECT * FROM room';
-    //     params = [];
-    //   }
-    //   conn.query(sql, params, function (err, rows, fields) {
-    //     if (err) {
-    //       res.send(err.message);
-    //       console.log('query is not excuted. select fail...\n' + err);
-    //     }
-    //     else {
-    //       var resArr = [];
-    //       for( var i = 0 ; i < rows.length ; ++i){
-    //         var r = rows[i];
-    //         if(isRoomAvailable(conn, r.num, r.check_in_date,r.check_out_date))
-    //           resArr.push(r);
-    //       }
-    //       res.send(resArr);
-    //       console.log(resArr);
-    //     }
-    //   });
-    // });
-
     //예약 가능한 룸
     app.post('/room/availableRoom', function (req, res) {
       var sql = 'SELECT * FROM room where type = ?';

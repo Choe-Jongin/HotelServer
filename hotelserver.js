@@ -34,25 +34,26 @@ app.get('/', (req, res) => {
 app.post('/login', async (req, res) => {
   const id = req.body.id;
   const password = req.body.password;
-
+  console.log("id:"+id +" pw:"+password);
   if (id.length === 0 || password.length === 0) {
-    res.sendStatus(403);
+    res.sendStatus(404);
     return;
   }
 
   conn.query('SELECT * FROM account WHERE id = ?', id, (err, rows) => {
     if (!!err || rows.length !== 1) {
-      res.sendStatus(403);
+      res.sendStatus(404);
       return;
     }
 
     const row = rows[0];
-    if (row.password !== password) {
+    console.log(row);
+    if (row.password !== password+"") {
       res.sendStatus(403);
       return;
     }
 
-    res.status(200).send({ 'auth': row.auth });
+    res.status(200).send({ 'name':row.cardnum ,'authority': row.Authority,'cardnum':row.cardnum });
   });
 });
 
