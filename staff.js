@@ -87,10 +87,30 @@ app.post('/staff/modify', function (req, res) {
     });
 });
 
+app.post('/staff/taskadd', function (req, res) {
+    var body = req.body;
+    console.log(body);
+
+    var sql = 'INSERT INTO staff '
+        + '(staff_id, task_id) '
+        + 'VALUES(?,?) ';
+    var params = [body.staff_id, body.task_id];
+
+    console.log(sql);
+    conn.query(sql, params, function (err, result) {
+        if (err) console.log('query is not excuted. insert fail…\n' + err);
+        else {
+            res.status(200).send("{staff_id:" + result.insertId + "}");
+        }
+    });
+});
+
+
 //직원 삭제
 app.delete('/staff/delete', function (req, res) {
+
     var body = req.body;
-    var sql = "DELETE FROM staff WHERE staff_id = ?";
+    var sql = "DELETE FROM staff_performance_ability WHERE staff_id = ?";
     var param = body.staff_id;
     console.log(sql);
     conn.query(sql, param, function (err, result) {
@@ -99,10 +119,24 @@ app.delete('/staff/delete', function (req, res) {
             console.log('query is not excuted. delete fail…\n' + err);
         }
         else {
-            console.log("Delete " + param);
-            res.status(200).end();
+            sql = "DELETE FROM staff WHERE staff_id = ?";
+            param = body.staff_id;
+            console.log(sql);
+            conn.query(sql, param, function (err, result) {
+                if (err) {
+                    res.status(404).end("{err:" + err + "}");
+                    console.log('query is not excuted. delete fail…\n' + err);
+                }
+                else {
+                    console.log("Delete " + param);
+                    res.status(200).end();
+                }
+            });
+
         }
     });
+
+    
 });
 
 module.exports = app;
