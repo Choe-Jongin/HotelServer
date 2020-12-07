@@ -23,7 +23,6 @@ app.get('/reservation/list', function (req, res) {
     });
 });
 
-
 //예약 추가
 app.post('/reservation/add', async (req, res) => {
     const guest_id = req.body.customer_id;
@@ -43,7 +42,7 @@ app.post('/reservation/add', async (req, res) => {
             + "(guest_id, room_num, check_in_date, check_out_date, staff_id) "
             + "VALUES(?, ?, ?, ?, ?)";
         var params = [guest_id, room_num, check_in_date, check_out_date, staff_id];
-        conn.query(sql, params, (err, rows) => {
+        conn.query(sql, params, (err, result) => {
             if (!!err) {
                 console.log(err)
                 res.sendStatus(403);
@@ -58,10 +57,9 @@ app.post('/reservation/add', async (req, res) => {
                     return;
                 }
                 console.log("add reservation")
-                res.status(200).send("{result:add reservation}");
+                res.status(200).send("{reservation_id:" + result.insertId + "}");
             });
-        }
-        );
+        });
 
     }).catch(err => {
         res.status(403).send("{result:"+(err.message)+"}");

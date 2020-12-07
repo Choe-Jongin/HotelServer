@@ -48,9 +48,9 @@ app.get('/room/list', function (req, res) {
 
 //예약 가능한 룸
 app.post('/room/availableRoom', function (req, res) {
-  var sql = 'SELECT * FROM room where type = ?';
-  var params = [req.body.type];
-  if (req.body.type == null) {
+  var sql = 'SELECT * FROM room where type_id = ?';
+  var params = [req.body.type_id];
+  if (req.body.type_id == null) {
     sql = 'SELECT * FROM room';
     params = [];
   }
@@ -77,13 +77,14 @@ app.post('/room/add', function (req, res) {
   var body = req.body;
   console.log(body);
 
-  var sql = 'INSERT INTO room (num, type) VALUES(?, ?)';
-  var params = [body.num, body.type];
+  var sql = 'INSERT INTO room (num, type_id) VALUES(?, ?)';
+  var params = [body.num, body.type_id];
   console.log(sql);
   conn.query(sql, params, function (err) {
     if (err) console.log('query is not excuted. insert fail…\n' + err);
-    else res.status(200).redirect('/list');
+    else res.status(200);
   });
+
 });
 
 //객실 등급 정보
@@ -128,11 +129,10 @@ app.post('/room/modify', function (req, res) {
       console.log('query is not excuted. update fail…\n' + err);
     }
     else {
-      res.status(200).end("{result:modei}");
+      res.status(200).end("{result:modified}");
     }
   });
 });
-
 
 //객실 삭제
 app.delete('/room/delete', function (req, res) {

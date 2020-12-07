@@ -13,15 +13,14 @@ var conn = mysql.createConnection({
   password: 'hoteladmin',
   database: 'hotel'
 })
-
 global.conn = conn;
 
 
-//파일 분리
+//분리한 파일 로드
 var room = require('./room');
 var reservation = require('./reservation');
 var staff = require('./staff');
-
+var requirements = require('./requirements');
 
 //서버 객체 설정
 var app = express();
@@ -33,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(room);
 app.use(reservation);
 app.use(staff);
+app.use(requirements);
 
 //이미지
 app.use(express.static(__dirname + "/publicimage"));
@@ -42,7 +42,6 @@ app.get('/', (req, res) => {
   // res.send('Hotel Server Root');
   res.send({result:'Hotel Server Root'});
 });
-
 
 //로그인
 app.post('/login', async (req, res) => {
@@ -70,7 +69,6 @@ app.post('/login', async (req, res) => {
     res.status(200).send({ 'name':row.cardnum ,'authority': row.Authority,'cardnum':row.cardnum });
   });
 });
-
 
 //서버 시작
 app.listen(port, function () {

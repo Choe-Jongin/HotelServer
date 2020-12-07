@@ -21,15 +21,19 @@ app.get('/staff/list', function (req, res) {
 });
 
 //직원 정보
-app.post('/staff/getstaff', function (req, res) {
+app.post('/staff/staffbyid', function (req, res) {
     var sql = 'SELECT * FROM staff where staff_id = ?';
     conn.query(sql, req.body.staff_id, function (err, rows, fields) {
         if (err) {
             res.send(err.message);
             console.log('query is not excuted. select fail...\n' + err);
         }
+        else if( rows.length == 0 ){
+            res.status(404).end();
+        }
         else {
-            res.status(200).send(rows);
+            console.log(rows[0]);
+            res.status(200).send(rows[0]);
         }
     });
 });
