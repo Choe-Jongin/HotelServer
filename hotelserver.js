@@ -70,6 +70,70 @@ app.post('/login', async (req, res) => {
   });
 });
 
+//로그인
+app.post('/login/register', async (req, res) => {
+  const id = req.body.id+"";
+  const password = req.body.password+"";
+  const name = req.body.name+"";
+  const authority = req.body.authority || 0;
+  const cardnum = req.body.cardnum || '0000';
+  if (id.length === 0 || password.length === 0) {
+    res.status(403).send({ 'result':'아이디 or 비밀번호 미입력' });
+    return;
+  }
+  conn.query('SELECT * FROM account WHERE id = ?', id, (err, rows) => {
+    if (!!err || rows.length !== 0) {
+      res.status(403).send({ 'result':'이미 존재하는 아이디' });
+      return;
+    }
+    conn.query('INSERT INTO account VALUES(?,?,?,?,?)',[id, password, name, authority,cardnum] , (err, rows) => {
+      if (!!err) {
+        console.log(err);
+        res.status(403).send({ 'result':'가입 실패' });
+        return;
+      }
+      console.log("회원가입");
+      res.status(200).send({ 'result':name+'님 계정 생성' });
+    });
+  });
+});
+
+//계정 정보 수정
+app.post('/login/modify', function (req, res) {
+  var body = req.body;
+
+  var fields = "";
+  var index = 0;
+  var params = [];
+  var count = Object.keys(body).length - 1;
+  console.log(body);
+  for (var o in body) {
+    if (o == 'id') continue;
+    fields += o + " = ? ";
+    params[index++] = body[o];
+    if (index < count)
+      fields += ", "
+  }
+
+  var sql = "UPDATE account SET " + fields
+    + "WHERE id = ?";
+  params[index] = body.id;
+  console.log(sql);
+  console.log(params);
+  conn.query(sql, params, function (err, result) {
+    if (err) {
+      res.status(403).end();
+      console.log('query is not excuted. update fail…\n' + err);
+    }
+    else {
+      res.status(200).end("{result:modified}");
+    }
+  });
+});
+
+
+
+
 //서버 시작
 app.listen(port, function () {
   console.log('server start :' + port);

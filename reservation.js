@@ -25,7 +25,7 @@ app.get('/reservation/list', function (req, res) {
 
 //예약 추가
 app.post('/reservation/add', async (req, res) => {
-    const guest_id = req.body.customer_id;
+    const guest_id = req.body.guest_id;
     const room_num = req.body.room_num;
     const check_in_date = req.body.check_in_date;
     const check_out_date = req.body.check_out_date;

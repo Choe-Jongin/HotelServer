@@ -6,30 +6,33 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.isRoomAvailable = function(conn, check_in, check_out, room) {
+
+function isRoomAvailable(conn, check_in, check_out, room) {
   return new Promise((res, rej) => {
     //예약 테이블에서 해당 기간에 해당 객실이 예약 되어있나 확인
     const sql = "SELECT * FROM reservation "
-        + "WHERE room_num = ? "
-        + "AND ( check_in_date < ? && ? < check_out_date )";
+      + "WHERE room_num = ? "
+      + "AND ( check_in_date < ? && ? < check_out_date )";
     const params = [room, check_out, check_in];
     conn.query(sql, params, function (err, rows) {
-        if (err)
-            rej(err);
-        else if (rows.length != 0)
-            rej(new Error('reserved'));
-        else {
-            //객실테이블에서 해당 기간에 사용중인지 확인
-            const sql = `SELECT * FROM room WHERE num = ? AND (check_in_date < ? && ? < check_out_date)`;
-            conn.query(sql, params, function (err, rows) {
-                if (err) rej(err);
-                else if (rows.length != 0) rej(new Error('Now occupied'));
-                else res(true);
-            });
-        }
+      if (err)
+        rej(err);
+      else if (rows.length != 0)
+        rej(new Error('reserved'));
+      else {
+        //객실테이블에서 해당 기간에 사용중인지 확인
+        const sql = `SELECT * FROM room WHERE num = ? AND (check_in_date < ? && ? < check_out_date)`;
+        conn.query(sql, params, function (err, rows) {
+          if (err) rej(err);
+          else if (rows.length != 0) rej(new Error('Now occupied'));
+          else res(true);
+        });
+      }
     });
-});
+  });
 }
+
+app.isRoomAvailable = isRoomAvailable;
 
 //객실 목록
 app.get('/room/list', function (req, res) {
