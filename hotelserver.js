@@ -34,8 +34,9 @@ app.use(reservation);
 app.use(staff);
 app.use(requirements);
 
-//이미지
+//리소스
 app.use(express.static(__dirname + "/publicimage"));
+app.use(express.static(__dirname + "/Asset"));
 
 //#######요청 및 응답#######
 app.get('/', (req, res) => {
@@ -70,7 +71,7 @@ app.post('/login', async (req, res) => {
   });
 });
 
-//로그인
+//회원가입
 app.post('/login/register', async (req, res) => {
   const id = req.body.id+"";
   const password = req.body.password+"";
@@ -92,7 +93,7 @@ app.post('/login/register', async (req, res) => {
         res.status(403).send({ 'result':'가입 실패' });
         return;
       }
-      console.log("회원가입");
+      console.log(name+" 회원가입");
       res.status(200).send({ 'result':name+'님 계정 생성' });
     });
   });
@@ -130,8 +131,6 @@ app.post('/login/modify', function (req, res) {
     }
   });
 });
-
-
 
 
 //서버 시작
