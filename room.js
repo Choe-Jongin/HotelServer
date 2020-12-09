@@ -50,6 +50,22 @@ app.get('/room/list', function (req, res) {
   });
 });
 
+//객실 목록
+app.post('/room/roombynum', function (req, res) {
+  var body = req.body;
+  var sql = 'SELECT * FROM room WHERE num = ?';
+  conn.query(sql, body.num,function (err, rows, fields) {
+    if (err) {
+      res.send(err.message);
+      console.log('query is not excuted. select fail...\n' + err);
+    }
+    else {
+      res.status(200).send(rows);
+      console.log(rows);
+    }
+  });
+});
+
 //예약 가능한 룸
 app.post('/room/availableRoom', function (req, res) {
   var body = req.body;

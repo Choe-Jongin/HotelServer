@@ -73,7 +73,7 @@ app.post('/login', async (req, res) => {
       return;
     }
 
-    res.status(200).send({ 'name':row.cardnum ,'authority': row.authority,'cardnum':row.cardnum });
+    res.status(200).send({ 'name':row.name ,'authority': row.authority,'cardnum':row.cardnum });
   });
 });
 
