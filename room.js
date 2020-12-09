@@ -50,7 +50,7 @@ app.get('/room/list', function (req, res) {
   });
 });
 
-//객실 목록
+//특정 객실 정보
 app.post('/room/roombynum', function (req, res) {
   var body = req.body;
   var sql = 'SELECT * FROM room WHERE num = ?';
