@@ -50,24 +50,27 @@ app.get('/requirements/type', function (req, res) {
     });
 });
 
-
 //요구사항과 직원 매칭
 app.post('/requirements/match', function (req, res) {
     var body = req.body;
     console.log(body);
 
-    var sql = 'INSERT INTO requirements_staff (staff_id, request_id) VALUES(?, ?)';
-    var params = [body.staff_id, body.request_id];
-    console.log(sql);
+    var sql = "UPDATE requirements SET staff_id = ? WHERE request_id = ?";
+    var params = [body.staff_id, body.request_id]
     conn.query(sql, params, function (err, result) {
-        if (err) console.log('query is not excuted. insert fail…\n' + err);
-        else res.status(200).send("{matching_id:" + result.insertId + "}");
+        if (err) {
+          res.status(403).end();
+          console.log('query is not excuted. update fail…\n' + err);
+        }
+        else {
+          res.status(200).end("{result:modified}");
+        }
     });
 });
 
 //직원이 할당된 요구사항
 app.get('/requirements/matched', function (req, res) {
-    var sql = 'SELECT * FROM requirements_staff natural join requirements';
+    var sql = 'SELECT * FROM requirements WHERE NOT(staff_id = "")';
     conn.query(sql, function (err, rows, fields) {
         if (err) {
             res.send(err.message);

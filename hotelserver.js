@@ -11,7 +11,8 @@ var conn = mysql.createConnection({
   host: 'hotel.cgapmdvczori.ap-northeast-2.rds.amazonaws.com',
   user: 'admin',
   password: 'hoteladmin',
-  database: 'hotel'
+  database: 'hotel',
+  dateStrings: 'date'
 })
 global.conn = conn;
 
@@ -21,6 +22,8 @@ var room = require('./room');
 var reservation = require('./reservation');
 var staff = require('./staff');
 var requirements = require('./requirements');
+var department = require('./department');
+var guest = require('./guest');
 
 //서버 객체 설정
 var app = express();
@@ -33,6 +36,8 @@ app.use(room);
 app.use(reservation);
 app.use(staff);
 app.use(requirements);
+app.use(department);
+app.use(guest);
 
 //리소스
 app.use(express.static(__dirname + "/publicimage"));
@@ -46,6 +51,7 @@ app.get('/', (req, res) => {
 
 //로그인
 app.post('/login', async (req, res) => {
+  var body = req.body;
   const id = req.body.id;
   const password = req.body.password;
   console.log("id:"+id +" pw:"+password);
@@ -67,30 +73,35 @@ app.post('/login', async (req, res) => {
       return;
     }
 
-    res.status(200).send({ 'name':row.cardnum ,'authority': row.Authority,'cardnum':row.cardnum });
+    res.status(200).send({ 'name':row.cardnum ,'authority': row.authority,'cardnum':row.cardnum });
   });
 });
 
 //회원가입
 app.post('/login/register', async (req, res) => {
+  var body = req.body;
   const id = req.body.id+"";
   const password = req.body.password+"";
   const name = req.body.name+"";
   const authority = req.body.authority || 0;
   const cardnum = req.body.cardnum || '0000';
-  if (id.length === 0 || password.length === 0) {
-    res.status(403).send({ 'result':'아이디 or 비밀번호 미입력' });
+  console.log(body);
+  if (id.length === 0 || password.length === 0 || name.length === 0) {
+    res.status(401).send({ 'result':'아이디 or 비밀번호 or 이름 미입력' });
+    console.log("아이디 or 비밀번호 or 이름 미입력")
     return;
   }
   conn.query('SELECT * FROM account WHERE id = ?', id, (err, rows) => {
     if (!!err || rows.length !== 0) {
       res.status(403).send({ 'result':'이미 존재하는 아이디' });
+      console.log("이미 존재하는 아이디")
       return;
     }
     conn.query('INSERT INTO account VALUES(?,?,?,?,?)',[id, password, name, authority,cardnum] , (err, rows) => {
       if (!!err) {
         console.log(err);
-        res.status(403).send({ 'result':'가입 실패' });
+        res.status(402).send({ 'result':'가입 실패' });
+        console.log("가입 실패");
         return;
       }
       console.log(name+" 회원가입");

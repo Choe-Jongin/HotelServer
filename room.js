@@ -7,13 +7,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
-function isRoomAvailable(conn, check_in, check_out, room) {
+function isRoomAvailable(conn, room, check_in, check_out) {
+  
   return new Promise((res, rej) => {
     //예약 테이블에서 해당 기간에 해당 객실이 예약 되어있나 확인
-    const sql = "SELECT * FROM reservation "
-      + "WHERE room_num = ? "
-      + "AND ( check_in_date < ? && ? < check_out_date )";
-    const params = [room, check_out, check_in];
+    const sql = 'SELECT * FROM reservation '
+      + 'WHERE room_num = ? '
+      + 'AND ( check_in_date < ? AND ? < check_out_date )';
+    const params = [room, new Date(check_out), new Date(check_in)];
     conn.query(sql, params, function (err, rows) {
       if (err)
         rej(err);
@@ -21,7 +22,7 @@ function isRoomAvailable(conn, check_in, check_out, room) {
         rej(new Error('reserved'));
       else {
         //객실테이블에서 해당 기간에 사용중인지 확인
-        const sql = `SELECT * FROM room WHERE num = ? AND (check_in_date < ? && ? < check_out_date)`;
+        const sql = 'SELECT * FROM room WHERE num = ? AND (check_in_date < ? AND ? < check_out_date)';
         conn.query(sql, params, function (err, rows) {
           if (err) rej(err);
           else if (rows.length != 0) rej(new Error('Now occupied'));
@@ -51,23 +52,37 @@ app.get('/room/list', function (req, res) {
 
 //예약 가능한 룸
 app.post('/room/availableRoom', function (req, res) {
+  var body = req.body;
+  const {check_in_date, check_out_date} = body;
   var sql = 'SELECT * FROM room where type_id = ?';
-  var params = [req.body.type_id];
-  if (req.body.type_id == null) {
+  var params = [body.type_id];
+  if (body.type_id == null) {
     sql = 'SELECT * FROM room';
     params = [];
   }
-  conn.query(sql, params, function (err, rows, fields) {
+  conn.query(sql, params, async function (err, rows, fields) {
     if (err) {
       res.send(err.message);
       console.log('query is not excuted. select fail...\n' + err);
     }
     else {
+      console.log(body.type_id + "타입의 호실");
+      console.log(rows);
       var resArr = [];
+
       for (var i = 0; i < rows.length; ++i) {
         var r = rows[i];
-        if (isRoomAvailable(conn, r.num, r.check_in_date, r.check_out_date))
-          resArr.push(r);
+        try {
+          const available = await isRoomAvailable(conn, r.num,check_in_date, check_out_date);
+
+          if(available) {
+            resArr.push(r);
+          }
+        } 
+        catch(err) {
+          //res.status(403).send("{result:"+(err.message)+"}");
+          console.error(err.message);
+        }
       }
       res.status(200).send(resArr);
       console.log(resArr);
@@ -80,8 +95,8 @@ app.post('/room/add', function (req, res) {
   var body = req.body;
   console.log(body);
 
-  var sql = 'INSERT INTO room (num, type_id) VALUES(?, ?)';
-  var params = [body.num, body.type_id];
+  var sql = 'INSERT INTO room (num, type_id, add_person) VALUES(?, ?, ?)';
+  var params = [body.num, body.type_id, body.add_person || 0];
   console.log(sql);
   conn.query(sql, params, function (err) {
     if (err) console.log('query is not excuted. insert fail…\n' + err);

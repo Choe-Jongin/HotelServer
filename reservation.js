@@ -25,23 +25,24 @@ app.get('/reservation/list', function (req, res) {
 
 //예약 추가
 app.post('/reservation/add', async (req, res) => {
-    const guest_id = req.body.guest_id;
+    const guest_id = req.body.guest_id || "walk in";
     const room_num = req.body.room_num;
     const check_in_date = req.body.check_in_date;
     const check_out_date = req.body.check_out_date;
     const staff_id = req.body.staff_id || 0;
+    const add_person = req.body.add_person || 0;
 
     if (!guest_id || !room_num || !check_in_date || !check_out_date) {
         res.sendStatus(403);
         return;
     }
-    room.isRoomAvailable(conn, check_in_date, check_out_date, room_num)
+    room.isRoomAvailable(conn, room_num,check_in_date, check_out_date)
     .then(() => {
         console.log("available");
         var sql = "INSERT INTO reservation "
-            + "(guest_id, room_num, check_in_date, check_out_date, staff_id) "
-            + "VALUES(?, ?, ?, ?, ?)";
-        var params = [guest_id, room_num, check_in_date, check_out_date, staff_id];
+            + "(guest_id, room_num, check_in_date, check_out_date, staff_id, add_person) "
+            + "VALUES(?, ?, ?, ?, ?, ?)";
+        var params = [guest_id, room_num, check_in_date, check_out_date, staff_id, add_person];
         conn.query(sql, params, (err, result) => {
             if (!!err) {
                 console.log(err)
@@ -64,7 +65,7 @@ app.post('/reservation/add', async (req, res) => {
     }).catch(err => {
         res.status(403).send("{result:"+(err.message)+"}");
         conn.rollback();
-        console.log(err);
+        console.log(err.message);
     });
 });
 
