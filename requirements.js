@@ -26,8 +26,8 @@ app.post('/requirements/add', function (req, res) {
     var body = req.body;
     console.log(body);
 
-    var sql = 'INSERT INTO requirements (room_num, request_type, importance, remark) VALUES(?, ?, ?)';
-    var params = [body.room_num, body.type, body.importance, body.remark];
+    var sql = 'INSERT INTO requirements (room_num, request_type, importance, remark) VALUES(?, ?, ?, ?)';
+    var params = [body.room_num, body.request_type, body.importance, body.remark];
     console.log(sql);
     conn.query(sql, params, function (err, result) {
         if (err) console.log('query is not excuted. insert fail…\n' + err);
@@ -56,8 +56,8 @@ app.post('/requirements/match', function (req, res) {
     var body = req.body;
     console.log(body);
 
-    var sql = 'INSERT INTO requirements_staff (staff_id, requirements_id) VALUES(?, ?)';
-    var params = [body.staff_id, body.requirements_id];
+    var sql = 'INSERT INTO requirements_staff (staff_id, request_id) VALUES(?, ?)';
+    var params = [body.staff_id, body.request_id];
     console.log(sql);
     conn.query(sql, params, function (err, result) {
         if (err) console.log('query is not excuted. insert fail…\n' + err);
@@ -67,7 +67,7 @@ app.post('/requirements/match', function (req, res) {
 
 //직원이 할당된 요구사항
 app.get('/requirements/matched', function (req, res) {
-    var sql = 'SELECT * FROM requirements_staff';
+    var sql = 'SELECT * FROM requirements_staff natural join requirements';
     conn.query(sql, function (err, rows, fields) {
         if (err) {
             res.send(err.message);
